@@ -11,7 +11,20 @@ import (
 // and acquire an exclusive lock on it
 // if the file already exists AND is still locked, it will fail
 func CreateLockFile(filename string) (*os.File, error) {
-    file, err := os.OpenFile("plop", os.O_WRONLY, 0666)
+
+    var (
+        file *os.File
+        err  error
+    )
+
+    if _, err = os.Stat(filename); os.IsNotExist(err) {
+        // file doesnt exist, create
+        file, err = os.Create(filename)
+    } else {
+        // file does exist, open
+        file, err = os.OpenFile(filename, os.O_WRONLY, 0666)
+    }
+
     if err != nil {
         return nil, err
     }
