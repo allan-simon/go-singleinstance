@@ -35,6 +35,7 @@ func CreateLockFile(filename string) (*os.File, error) {
 		return nil, err
 	}
 
+	// Write PID to lock file
 	_, err = file.WriteString(strconv.Itoa(os.Getpid()))
 	if err != nil {
 		return nil, err
@@ -43,6 +44,7 @@ func CreateLockFile(filename string) (*os.File, error) {
 	return file, nil
 }
 
+// If filename is a lock file, returns the PID of the process locking it
 func GetLockFilePid(filename string) (pid int, err error) {
 	contents, err := ioutil.ReadFile(filename)
 	if err != nil {
