@@ -1,5 +1,5 @@
 # go-singleinstance
-cross plateform library to have only one instance of a software (based on python's trendo)
+cross plateform library to have only one instance of a software (based on python's [tendo](https://github.com/pycontribs/tendo/blob/master/tendo/singleton.py))
 
 
 ## Usage
