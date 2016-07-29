@@ -4,21 +4,31 @@ package singleinstance
 
 import (
 	"os"
+	"strconv"
 )
 
-// CreateLockFile try to create a file with given name
-// and acquire an exclusive lock on it
-// if the file already exists AND is still locked, it will fail
+// CreateLockFile tries to create a file with given name and acquire an
+// exclusive lock on it. If the file already exists AND is still locked, it will
+// fail.
 func CreateLockFile(filename string) (*os.File, error) {
-	// if the files exists
-	if _, err := os.Stat(filename); err == nil {
-		// we first try to remove it
+	if _, err := os.Stat(filename); !os.IsNotExist(err) {
+		// If the files exists, we first try to remove it
 		err = os.Remove(filename)
 		if err != nil {
 			return nil, err
 		}
-
 	}
-	// and we try to acquire an exclusive "lock on it"
-	return os.OpenFile(filename, os.O_CREATE|os.O_EXCL|os.O_RDWR, 0666)
+
+	file, err := os.OpenFile(filename, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	if err != nil {
+		return nil, err
+	}
+
+	// Write PID to lock file
+	_, err = file.WriteString(strconv.Itoa(os.Getpid()))
+	if err != nil {
+		return nil, err
+	}
+
+	return file, nil
 }

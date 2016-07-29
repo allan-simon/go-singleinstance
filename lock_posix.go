@@ -3,15 +3,14 @@
 package singleinstance
 
 import (
-	"io/ioutil"
 	"os"
 	"strconv"
 	"syscall"
 )
 
-// CreateLockFile try to create a file with given name
-// and acquire an exclusive lock on it
-// if the file already exists AND is still locked, it will fail
+// CreateLockFile tries to create a file with given name and acquire an
+// exclusive lock on it. If the file already exists AND is still locked, it will
+// fail.
 func CreateLockFile(filename string) (*os.File, error) {
 	var (
 		file *os.File
@@ -19,11 +18,11 @@ func CreateLockFile(filename string) (*os.File, error) {
 	)
 
 	if _, err = os.Stat(filename); os.IsNotExist(err) {
-		// file doesnt exist, create
+		// File doesn't exist, create it
 		file, err = os.Create(filename)
 	} else {
-		// file does exist, open
-		file, err = os.OpenFile(filename, os.O_WRONLY, 0666)
+		// File does exist, open it
+		file, err = os.OpenFile(filename, os.O_WRONLY, 0600)
 	}
 
 	if err != nil {
@@ -42,15 +41,4 @@ func CreateLockFile(filename string) (*os.File, error) {
 	}
 
 	return file, nil
-}
-
-// If filename is a lock file, returns the PID of the process locking it
-func GetLockFilePid(filename string) (pid int, err error) {
-	contents, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return
-	}
-
-	pid, err = strconv.Atoi(string(contents))
-	return
 }
