@@ -12,31 +12,25 @@ import (
 // exclusive lock on it. If the file already exists AND is still locked, it will
 // fail.
 func CreateLockFile(filename string) (*os.File, error) {
-	var (
-		file *os.File
-		err  error
-	)
-
-	if _, err = os.Stat(filename); os.IsNotExist(err) {
-		// File doesn't exist, create it
-		file, err = os.Create(filename)
-	} else {
-		// File does exist, open it
-		file, err = os.OpenFile(filename, os.O_WRONLY, 0600)
-	}
-
+	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		return nil, err
 	}
 
 	err = syscall.Flock(int(file.Fd()), syscall.LOCK_EX|syscall.LOCK_NB)
 	if err != nil {
+		file.Close()
 		return nil, err
 	}
 
 	// Write PID to lock file
-	_, err = file.WriteString(strconv.Itoa(os.Getpid()))
-	if err != nil {
+	contents := strconv.Itoa(os.Getpid())
+	if err := file.Truncate(0); err != nil {
+		file.Close()
+		return nil, err
+	}
+	if _, err := file.WriteString(contents); err != nil {
+		file.Close()
 		return nil, err
 	}
 
