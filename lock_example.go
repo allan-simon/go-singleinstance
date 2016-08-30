@@ -10,9 +10,19 @@ import (
 )
 
 func main() {
-	_, err := singleinstance.CreateLockFile("plop.lock")
+	filename := "plop.lock"
+
+	_, err := singleinstance.CreateLockFile(filename)
 	if err != nil {
 		fmt.Println("An instance already exists")
+
+		pid, err := singleinstance.GetLockFilePid(filename)
+		if err != nil {
+			fmt.Println("Cannot get PID:", err)
+			return
+		}
+
+		fmt.Println("Locking PID:", pid)
 		return
 	}
 
