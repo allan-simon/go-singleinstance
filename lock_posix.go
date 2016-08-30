@@ -29,7 +29,7 @@ func CreateLockFile(filename string) (*os.File, error) {
 		return nil, err
 	}
 
-	err = syscall.Flock(int(file.Fd()), syscall.LOCK_EX|syscall.LOCK_NB)
+	err = syscall.Flock(int(file.Fd()), syscall.LOCK_SH|syscall.LOCK_NB)
 	if err != nil {
 		return nil, err
 	}
