@@ -25,13 +25,15 @@ func TestCreateLockFile(t *testing.T) {
 	f := createTestLock(t)
 	defer os.Remove(f.Name())
 
-	if _, err := CreateLockFile(f.Name()); err == nil {
+	_, err := CreateLockFile(f.Name())
+	if err == nil {
 		t.Fatal("Expected an error while trying to lock, got:", err)
 	}
 
 	f.Close() // Remove the lock
 
-	if _, err := CreateLockFile(f.Name()); err != nil {
+	f, err = CreateLockFile(f.Name())
+	if err != nil {
 		t.Fatal("Expected no error while trying to lock, got:", err)
 	}
 
