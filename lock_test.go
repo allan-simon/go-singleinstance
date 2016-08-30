@@ -41,6 +41,7 @@ func TestCreateLockFile(t *testing.T) {
 func TestGetLockFilePid(t *testing.T) {
 	f := createTestLock(t)
 	defer os.Remove(f.Name())
+	defer f.Close()
 
 	pid, err := GetLockFilePid(f.Name())
 	if err != nil {
